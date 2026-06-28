@@ -191,6 +191,13 @@ static const struct file_operations gpio_fops = {
 	.read           = gpio_read,
 	.write          = gpio_write,
 	.unlocked_ioctl = gpio_ioctl,
+	/*
+	 * Without an explicit .llseek, vfs_llseek() falls back to no_llseek
+	 * which returns -ESPIPE on any lseek() call.  default_llseek simply
+	 * updates file->f_pos, which our read() uses via *ppos to give one
+	 * fresh sample per read() without reopening the fd.
+	 */
+	.llseek         = default_llseek,
 };
 
 /* Module init / exit ------------------------------------------------------- */
